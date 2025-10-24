@@ -1,12 +1,15 @@
-# Course Recommendation Agent Dockerfile
-# Uses Python 3.13 slim image for smaller size
+# =========================================================
+# Course Recommendation Agent Dockerfile (Fixed for Bedrock)
+# Compatible architecture: arm64
+# =========================================================
 
-FROM --platform=linux/arm64 python:3.13-slim
+# Use an ARM64-compatible Python image (Python 3.11 recommended for stability)
+FROM --platform=linux/arm64 python:3.11-slim
 
 # Set working directory
 WORKDIR /app
 
-# Set environment variables
+# Environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -14,11 +17,11 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install system dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get install -y --no-install-recommends ca-certificates curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY course_requirements.txt requirements.txt
+# Copy requirements (improves Docker layer caching)
+COPY course_requirements.txt ./requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -26,12 +29,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY course_agent.py .
 
-# Expose port 8080 (AgentCore default)
+# Expose default port for Bedrock AgentCore
 EXPOSE 8080
 
-# Health check
+# Add health check - expects FastAPI/Flask app to have /ping endpoint
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/ping')" || exit 1
+    CMD curl -f http://localhost:8080/ping || exit 1
 
-# Run the agent
-CMD ["python", "course_agent.py"]
+# Run FastAPI app directly (recommended for Bedrock)
+CMD ["uvicorn", "course_agent:app", "--host", "0.0.0.0", "--port", "8080"]
