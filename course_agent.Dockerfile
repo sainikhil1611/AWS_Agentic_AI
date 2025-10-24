@@ -14,8 +14,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install system dependencies
 SUDO RUN apt-get update && \
-SUDO apt-get install -y --no-install-recommends ca-certificates \
-    && SUDO rm -rf /var/lib/apt/lists/*
+SUDO apt-get install -y --no-install-recommends ca-certificates && \
+SUDO rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
 COPY course_requirements.txt requirements.txt
