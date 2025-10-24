@@ -17,13 +17,13 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
-COPY requirements.txt .
+COPY job_agent.requirements.txt requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY agent.py .
+COPY job_agent.py agent.py
 
 # Expose port 8080 (AgentCore default)
 EXPOSE 8080
