@@ -10,9 +10,9 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+SUDO RUN apt-get update && \
+    SUDO apt-get install -y --no-install-recommends ca-certificates && \
+    SUDO rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install dependencies
 COPY project_requirements.txt requirements.txt
