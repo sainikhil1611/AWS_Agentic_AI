@@ -1,53 +1,37 @@
-# ------------------------------
-# Stage 1: Build stage
-# ------------------------------
-FROM python:3.12-slim AS builder
+# Course Recommendation Agent Dockerfile
+# Uses Python 3.13 slim image for amd64 architecture
 
-# Avoid interactive prompts during apt install
-ENV DEBIAN_FRONTEND=noninteractive
-ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
-
-# Install required system packages
-RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends \
-        curl \
-        ca-certificates \
-        gnupg2 \
-        lsb-release \
-        build-essential \
-        python3-dev \
-        apt-transport-https \
-    && rm -rf /var/lib/apt/lists/*
+FROM --platform=linux/amd64 python:3.13-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy Python dependencies first for caching
-COPY course_requirements.txt requirements.txt
-COPY requirements.txt .
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install Python dependencies in builder stage
-RUN pip install --no-cache-dir -r requirements.txt
-
-# ------------------------------
-# Stage 2: Final lightweight image
-# ------------------------------
-FROM python:3.12-slim
-
-# Copy system certificates
-RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends ca-certificates curl && \
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Set working directory
-WORKDIR /app
+# Copy requirements first for better caching
+COPY course_requirements.txt requirements.txt
 
-# Copy installed Python packages from builder stage
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY . /app
+COPY course_agent.py .
 
-# Set default command
-CMD ["python", "main.py"]
+# Expose port 8080 (AgentCore default)
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/ping')" || exit 1
+
+# Run the agent
+CMD ["python", "course_agent.py"]
