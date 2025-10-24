@@ -14,6 +14,10 @@ import os
 import urllib.request
 import urllib.parse
 from typing import Dict, Optional
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize logging
 logging.basicConfig(
@@ -24,13 +28,19 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 AWS_REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
-SERPAPI_KEY = os.getenv("SERPAPI_KEY", "77c80a150d1b42154fa2d40ece4cf808c85279857677c8226499beb91378cefe")
-NEBULA_API_KEY = os.getenv("NEBULA_API_KEY", "AIzaSyC2MbNxOIBgRf3ebgj6QGYUJtHzVV1so_Y")
+SERPAPI_KEY = os.getenv("SERPAPI_KEY")
+NEBULA_API_KEY = os.getenv("NEBULA_API_KEY")
 
 # Agent endpoints (configure these based on deployment)
 JOB_AGENT_URL = os.getenv("JOB_AGENT_URL", "http://localhost:8081/invocations")
 COURSE_AGENT_URL = os.getenv("COURSE_AGENT_URL", "http://localhost:8082/invocations")
 PROJECT_AGENT_URL = os.getenv("PROJECT_AGENT_URL", "http://localhost:8083/invocations")
+
+# Validate required environment variables
+if not SERPAPI_KEY:
+    raise ValueError("SERPAPI_KEY environment variable is required")
+if not NEBULA_API_KEY:
+    raise ValueError("NEBULA_API_KEY environment variable is required")
 
 # Initialize BedrockAgentCore app
 app = BedrockAgentCoreApp()
