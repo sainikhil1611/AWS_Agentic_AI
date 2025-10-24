@@ -12,6 +12,10 @@ import urllib.request
 import urllib.error
 import logging
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize logging
 logging.basicConfig(
@@ -21,10 +25,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configuration
-NEBULA_API_KEY = os.getenv("NEBULA_API_KEY", "AIzaSyC2MbNxOIBgRf3ebgj6QGYUJtHzVV1so_Y")
-NEBULA_BASE_URL = "https://api.utdnebula.com"
+NEBULA_API_KEY = os.getenv("NEBULA_API_KEY")
+NEBULA_BASE_URL = os.getenv("NEBULA_BASE_URL", "https://api.utdnebula.com")
 MAX_DESC_LENGTH = 250
 AWS_REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
+
+# Validate required environment variables
+if not NEBULA_API_KEY:
+    raise ValueError("NEBULA_API_KEY environment variable is required")
 
 # Initialize BedrockAgentCore app
 app = BedrockAgentCoreApp()

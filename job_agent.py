@@ -6,14 +6,22 @@ import urllib.request
 import urllib.parse
 import logging
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # Configuration
-SERPAPI_KEY = os.getenv("SERPAPI_KEY", "77c80a150d1b42154fa2d40ece4cf808c85279857677c8226499beb91378cefe")
+SERPAPI_KEY = os.getenv("SERPAPI_KEY")
 MAX_DESC_LENGTH = 200
+
+# Validate required environment variables
+if not SERPAPI_KEY:
+    raise ValueError("SERPAPI_KEY environment variable is required")
 
 # Initialize BedrockAgentCore app
 app = BedrockAgentCoreApp()
