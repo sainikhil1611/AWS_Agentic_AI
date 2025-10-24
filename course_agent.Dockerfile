@@ -1,6 +1,4 @@
-# Bedrock AgentCore Dockerfile (ARM64)
-# Uses Python 3.13 slim image for ARM64
-
+# Course Agent Dockerfile (ARM64, cross-build safe)
 FROM --platform=linux/arm64 python:3.13-slim
 
 # Set working directory
@@ -12,21 +10,26 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install system dependencies
+# Install system dependencies (safe for QEMU/ARM64 builds)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates curl && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        gnupg2 \
+        lsb-release \
+        apt-transport-https && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy Python requirements
+# Copy requirements first for better caching
 COPY course_requirements.txt requirements.txt
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy agent code
+# Copy application code
 COPY course_agent.py .
 
-# Expose default AgentCore port
+# Expose AgentCore default port
 EXPOSE 8080
 
 # Healthcheck
