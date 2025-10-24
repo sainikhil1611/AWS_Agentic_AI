@@ -1,5 +1,5 @@
 # Orchestrator Agent Dockerfile
-FROM python:3.13-slim
+FROM --platform=linux/arm64 python:3.13-slim
 
 WORKDIR /app
 

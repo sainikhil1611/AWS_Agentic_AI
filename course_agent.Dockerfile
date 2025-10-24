@@ -1,7 +1,7 @@
 # Course Recommendation Agent Dockerfile
 # Uses Python 3.13 slim image for smaller size
 
-FROM python:3.13-slim
+FROM --platform=linux/arm64 python:3.13-slim
 
 # Set working directory
 WORKDIR /app

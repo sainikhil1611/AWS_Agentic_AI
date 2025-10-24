@@ -1,5 +1,5 @@
-# Use Python 3.13 slim image for smaller size
-FROM python:3.13-slim
+# Use Python 3.13 slim image for smaller size (arm64 architecture)
+FROM --platform=linux/arm64 python:3.13-slim
 
 # Set working directory
 WORKDIR /app
