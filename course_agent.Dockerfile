@@ -23,6 +23,7 @@ RUN apt-get update -y && \
 WORKDIR /app
 
 # Copy Python dependencies first for caching
+COPY course_requirements.txt requirements.txt
 COPY requirements.txt .
 
 # Install Python dependencies in builder stage
